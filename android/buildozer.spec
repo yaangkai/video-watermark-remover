@@ -18,6 +18,5 @@ p4a.url = https://gitee.com/mirrors/python-for-android.git
 p4a.branch = master
 android.allow_backup = True
 log_level = 2
-
 [buildozer]
 warn_on_root = 0
