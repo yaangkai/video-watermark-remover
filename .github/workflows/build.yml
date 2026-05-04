@@ -1,24 +1,20 @@
 name: Build APK
-
 on:
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-
-      - name: Install dependencies
+          python-version: '3.10'
+      - name: Accept Android License & Install Deps
         run: |
-          pip install buildozer cython
+          pip install --upgrade buildozer cython
           sudo apt-get update
-          sudo apt-get install -y autoconf automake libtool pkg-config make default-jdk zip unzip
-
+          sudo apt-get install -y autoconf automake libtool pkg-config make default-jdk zip unzip aapt
+          yes | sdkmanager --licenses
       - name: Build APK
         run: buildozer android debug
