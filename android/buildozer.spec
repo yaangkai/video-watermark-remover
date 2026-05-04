@@ -5,7 +5,7 @@ package.domain = com.xiake.watermark
 source.dir = .
 source.include_exts = py,png,jpg,kv,atlas
 version = 1.0.0
-requirements = python3,kivy,opencv-python-headless,numpy,pillow
+requirements = python3,kivy,opencv-python-headless,pillow
 android.permissions = READ_EXTERNAL_STORAGE,WRITE_EXTERNAL_STORAGE,READ_MEDIA_VIDEO
 android.api = 33
 android.minapi = 24
@@ -18,5 +18,6 @@ p4a.url = https://gitee.com/mirrors/python-for-android.git
 p4a.branch = master
 android.allow_backup = True
 log_level = 2
+
 [buildozer]
 warn_on_root = 0
