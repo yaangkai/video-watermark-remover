@@ -17,14 +17,35 @@ jobs:
         with:
           python-version: '3.11'
       
-      - name: Install system dependencies (from official buildozer Dockerfile)
+      - name: Install system dependencies
         run: |
+          pip install buildozer==1.5.0 cython==3.0.10
           sudo apt-get update
           sudo apt-get install -y \
             autoconf automake build-essential ccache cmake gettext git \
             libffi-dev libltdl-dev libssl-dev libtool openjdk-17-jdk \
             patch pkg-config unzip zip zlib1g-dev
-          pip install buildozer cython
+      
+      - name: Pre-install Android SDK in buildozer directory
+        run: |
+          # 创建 buildozer 期望的目录
+          mkdir -p ~/.buildozer/android/platform/android-sdk
+          cd ~/.buildozer/android/platform/android-sdk
+          
+          # 下载 command-line tools
+          wget -q https://dl.google.com/android/repository/commandlinetools-linux-6514223_latest.zip
+          unzip -q commandlinetools-linux-6514223_latest.zip
+          rm commandlinetools-linux-6514223_latest.zip
+          
+          # 创建 licenses 目录并接受所有 license
+          mkdir -p licenses
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > licenses/android-sdk-license
+          echo -e "\nd56f5187479451eabf01fb78af6dfcb131a6481e" >> licenses/android-sdk-license
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > licenses/android-sdk-preview-license
+          echo -e "\ne6b7c2ab7fa2298c15165e9583d0cbd263c20057" >> licenses/android-sdk-license
+          
+          # 安装 build-tools 和 platform
+          yes | tools/bin/sdkmanager --sdk_root=. "build-tools;33.0.0" "platforms;android-33" "platform-tools"
       
       - name: Build APK
         run: |
