@@ -6,15 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python
+
+      - name: Setup Python 3.10
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Accept Android License & Install Deps
+
+      - name: Install System Dependencies
         run: |
-          pip install --upgrade buildozer cython
           sudo apt-get update
-          sudo apt-get install -y autoconf automake libtool pkg-config make default-jdk zip unzip aapt
-          yes | sdkmanager --licenses
-      - name: Build APK
+          sudo apt-get install -y autoconf automake libtool pkg-config make openjdk-17-jdk-headless zip unzip
+
+      - name: Install Buildozer
+        run: pip install buildozer cython==0.29.37
+
+      - name: Auto Accept Android License
+        run: yes | buildozer android accept_license
+
+      - name: Build APK Release
         run: buildozer android debug
