@@ -20,13 +20,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y \
             autoconf automake libtool pkg-config cmake \
-            default-jdk zip unzip
-                    
+            default-jdk zip unzip lld
+          
       - name: Build APK
         run: |
           cd android
+          mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+          echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-preview-license
           buildozer android debug
-                    
+          
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
