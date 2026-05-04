@@ -7,46 +7,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    container:
+      image: kivy/buildozer:latest
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
       
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      
-      - name: Install system dependencies
-        run: |
-          pip install buildozer cython
-          sudo apt-get update
-          sudo apt-get install -y \
-            autoconf automake libtool pkg-config cmake \
-            default-jdk zip unzip lld \
-            libffi-dev libssl-dev
-      
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-      
-      - name: Install Android SDK components
-        run: |
-          # 安装 build-tools 和 platform
-          yes | sdkmanager --install \
-            "build-tools;33.0.0" \
-            "platforms;android-33" \
-            "platform-tools" || true
-          # 接受所有 license
-          yes | sdkmanager --licenses || true
-      
-      - name: Build APK with buildozer
+      - name: Build APK
         run: |
           cd android
-          # 设置环境变量，让 buildozer 使用预装的 SDK
-          export ANDROID_SDK_ROOT=$ANDROID_HOME
-          export ANDROID_HOME=$ANDROID_HOME
-          # 告诉 buildozer 不要自己下载 SDK
-          export BUILDOSER_ALLOW_ROOT=1
           buildozer android debug
       
       - name: Upload APK artifact
