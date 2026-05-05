@@ -1,5 +1,5 @@
 """
-视频去水印工具 - Kivy Android 版（简化版，不依赖 numpy）
+视频去水印工具 - Kivy Android 版（修复权限问题）
 """
 import os
 import threading
@@ -11,7 +11,16 @@ from kivy.uix.filechooser import FileChooserListView
 from kivy.uix.popup import Popup
 from kivy.uix.progressbar import ProgressBar
 from kivy.clock import Clock
-from kivy.graphics import Color, Rectangle
+from kivy.utils import platform
+
+# Android 权限处理
+if platform == 'android':
+    from android.permissions import request_permissions, Permission
+    request_permissions([
+        Permission.READ_EXTERNAL_STORAGE,
+        Permission.WRITE_EXTERNAL_STORAGE,
+        Permission.READ_MEDIA_VIDEO,
+    ])
 
 
 class WatermarkRemoverApp(App):
@@ -90,10 +99,16 @@ class WatermarkRemoverApp(App):
         """显示文件选择器"""
         content = BoxLayout(orientation='vertical')
         
+        # 根据平台选择默认路径
+        if platform == 'android':
+            default_path = '/storage/emulated/0/DCIM'
+        else:
+            default_path = os.path.expanduser('~')
+        
         # 文件选择器
         file_chooser = FileChooserListView(
             filters=['*.mp4', '*.avi', '*.mov', '*.mkv', '*.flv', '*.wmv'],
-            path=os.path.expanduser('~')
+            path=default_path
         )
         content.add_widget(file_chooser)
         
@@ -177,17 +192,13 @@ class WatermarkRemoverApp(App):
                     break
                 
                 # 简单处理：裁剪掉右下角水印区域
-                # 这里只是示例，实际应用中需要更复杂的水印检测和去除算法
                 h, w = frame.shape[:2]
-                # 假设水印在右下角 10% 区域
                 watermark_h = int(h * 0.1)
                 watermark_w = int(w * 0.1)
                 
                 # 用周围像素填充水印区域
                 if watermark_h > 0 and watermark_w > 0:
-                    # 获取水印区域上方的像素
                     source_region = frame[h-watermark_h-watermark_h:h-watermark_h, w-watermark_w:w]
-                    # 复制到水印区域
                     frame[h-watermark_h:h, w-watermark_w:w] = source_region
                 
                 out.write(frame)
